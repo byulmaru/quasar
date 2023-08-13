@@ -9,6 +9,7 @@ type OAuthAppClient = {
 
 const oAuthApp = pgTable('oauth_apps', {
   domain: text('domain').notNull().primaryKey(),
+  webfingerDomain: text('webfinger_domain').notNull(),
   type: text('type').notNull().$type<OAuthAppType>(),
   client: json('client').notNull().$type<OAuthAppClient>(),
 });

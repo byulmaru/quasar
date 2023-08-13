@@ -3,10 +3,11 @@ import app from '../../app';
 import oAuthAppTable from '../../schema/oauth-app';
 import { HTTPException } from 'hono/http-exception';
 import api from '../../api';
+import { createApp, getInstance } from '../../apis/mastodon';
+import { scopes, makeRedirectURI } from '../../constant';
 
-type MastodonAppCreateResult = {
-  client_id: string,
-  client_secret: string
+type MastodonOAuthTokenResult = {
+  access_token: string,
 };
 
 const router = app();
@@ -18,18 +19,11 @@ router.get('/:instance', async(ctx) => {
     eq(oAuthAppTable.domain, instance)
   ))[0];
   if(!oAuthApp || oAuthApp.type !== 'mastodon') {
-    await api<MastodonAppCreateResult>(instance, 'POST', '/api/v1/apps', {
-      client_name: 'Quasar by Planet',
-      redirect_uris: `https://quasar.planet.moe/api/auth/mastodon/${instance}/callback`,
-      scopes: 'read:accounts read:follows write:statuses write:media',
-      website: 'https://quasar.planet.moe'
-    })
-    .catch(() => {
-      throw new HTTPException(422, {message: 'Invalid instance'});
-    })
+    await createApp(instance)
     .then(
-      (res) => db.insert(oAuthAppTable).values({
+      async(res) => db.insert(oAuthAppTable).values({
         domain: instance,
+        webfingerDomain: (await getInstance(instance)).domain,
         type: 'mastodon',
         client: {
           id: res.client_id,
@@ -57,7 +51,7 @@ router.get('/:instance', async(ctx) => {
     });
   }
   return ctx.json({
-    url: `https://${instance}/oauth/authorize?client_id=${oAuthApp.client.id}&redirect_uri=https://quasar.planet.moe/auth/mastodon/${instance}/callback&response_type=code&scope=read:accounts+read:follows+write:statuses+write:media`
+    url: `https://${instance}/oauth/authorize?client_id=${oAuthApp.client.id}&redirect_uri=${encodeURIComponent(makeRedirectURI(instance))}&response_type=code&scope=${scopes.join('+')}`
   });
 });
 
