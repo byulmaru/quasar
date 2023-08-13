@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { InferModel, eq } from 'drizzle-orm';
 import app from '../../app';
 import oAuthAppTable from '../../schema/oauth-app';
 import { HTTPException } from 'hono/http-exception';
@@ -21,26 +21,23 @@ router.get('/:instance', async(ctx) => {
   if(!oAuthApp || oAuthApp.type !== 'mastodon') {
     await createApp(instance)
     .then(
-      async(res) => db.insert(oAuthAppTable).values({
-        domain: instance,
-        webfingerDomain: (await getInstance(instance)).domain,
-        type: 'mastodon',
-        client: {
-          id: res.client_id,
-          secret: res.client_secret,
-        }
-      })
-      .onConflictDoUpdate({
-        target: oAuthAppTable.domain,
-        set: {
+      async(res) => {
+        const insertData: InferModel<typeof oAuthAppTable> = {
+          domain: instance,
+          webfingerDomain: (await getInstance(instance)).domain,
           type: 'mastodon',
           client: {
             id: res.client_id,
             secret: res.client_secret,
           }
         }
-      })
-      .returning()
+        return db.insert(oAuthAppTable).values(insertData)
+        .onConflictDoUpdate({
+          target: oAuthAppTable.domain,
+          set: insertData
+        })
+        .returning()
+      }
     )
     .then(insertedApp => {
       oAuthApp = insertedApp[0];
