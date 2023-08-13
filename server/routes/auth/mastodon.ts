@@ -2,13 +2,11 @@ import { InferModel, eq } from 'drizzle-orm';
 import app from '../../app';
 import oAuthAppTable from '../../schema/oauth-app';
 import { HTTPException } from 'hono/http-exception';
-import api from '../../api';
-import { createApp, getInstance } from '../../apis/mastodon';
+import { createApp, getInstance, createOAuthToken, getProfileByToken } from '../../apis/mastodon';
 import { scopes, makeRedirectURI } from '../../constant';
-
-type MastodonOAuthTokenResult = {
-  access_token: string,
-};
+import profileTable from '../../schema/profile';
+import { SignJWT } from 'jose';
+import { setCookie } from 'hono/cookie';
 
 const router = app();
 
@@ -47,14 +45,48 @@ router.get('/:instance', async(ctx) => {
       throw new HTTPException(500, {message: 'Internal Server Error'});
     });
   }
-  return ctx.json({
-    url: `https://${instance}/oauth/authorize?client_id=${oAuthApp.client.id}&redirect_uri=${encodeURIComponent(makeRedirectURI(instance))}&response_type=code&scope=${scopes.join('+')}`
-  });
+  return ctx.redirect(
+    `https://${instance}/oauth/authorize?client_id=${oAuthApp.client.id}&redirect_uri=${encodeURIComponent(makeRedirectURI(instance))}&response_type=code&scope=${scopes.join('+')}&force_login=${!!ctx.req.query('forceLogin')}`
+  );
 });
 
 router.get('/:instance/callback', async(ctx) => {
   const instance = ctx.req.param('instance');
   const code = ctx.req.query('code');
+
+  const oAuthApp = (await ctx.get('db').select().from(oAuthAppTable).where(
+    eq(oAuthAppTable.domain, instance)
+  ))[0];
+  if(!oAuthApp || oAuthApp.type !== 'mastodon') {
+    throw new HTTPException(422, {message: 'Invalid instance'});
+  }
+  const accessToken = (await createOAuthToken(instance, oAuthApp.client, code!)).access_token;
+  const credentials = await getProfileByToken(instance, accessToken);
+  const insertData: InferModel<typeof profileTable> = {
+    acct: `${credentials.username}@${oAuthApp.webfingerDomain}`,
+    name: credentials.display_name,
+    accessToken,
+    data: {
+      avatar: credentials.avatar,
+      note: credentials.note,
+    }
+  }
+  await ctx.get('db').insert(profileTable).values(insertData)
+  .onConflictDoUpdate({
+    target: profileTable.acct,
+    set: insertData
+  });
+  const jwt = await new SignJWT({
+    acct: insertData.acct,
+    name: insertData.name,
+    avatar: insertData.data.avatar,
+  })
+  .setProtectedHeader({ alg: 'HS256' })
+  .setIssuedAt()
+  .setExpirationTime('1h')
+  .sign(new TextEncoder().encode(ctx.env.JWT_SECRET));
+  setCookie(ctx, 'token', jwt);
+  return ctx.redirect('/');
 });
 
 export default router;

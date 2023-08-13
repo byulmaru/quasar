@@ -2,12 +2,20 @@ import { HTTPException } from 'hono/http-exception';
 import api from '../api';
 import { scopes, makeRedirectURI } from '../constant';
 
+type Profile = {
+  id: string,
+  username: string,
+  avatar: string,
+  note: string,
+  display_name: string,
+}
+
 type CreateAppResult = {
   client_id: string,
   client_secret: string
 };
 
-export const createApp = (instance) => api<CreateAppResult>(instance, 'POST', '/api/v1/apps', {
+export const createApp = (instance: string) => api<CreateAppResult>(instance, 'POST', '/api/v1/apps', {
   client_name: 'Quasar by Planet',
   redirect_uris: makeRedirectURI(instance),
   scopes: scopes.join(' '),
@@ -21,4 +29,25 @@ type GetInstanceResult = {
   domain: string,
 }
 
-export const getInstance = (instance) => api<GetInstanceResult>(instance, 'GET', '/api/v2/instance');
+export const getInstance = (instance: string) => api<GetInstanceResult>(instance, 'GET', '/api/v2/instance');
+
+type CreateOAuthTokenResult = {
+  access_token: string,
+};
+
+export const createOAuthToken = (instance: string, client: { id: string, secret: string }, code: string) => api<CreateOAuthTokenResult>(instance, 'POST', '/oauth/token', {
+  grant_type: 'authorization_code',
+  code,
+  client_id: client.id,
+  client_secret: client.secret,
+  redirect_uri: makeRedirectURI(instance),
+  scope: scopes.join(' '),
+});
+
+export const getProfileByToken = (instance: string, token: string) => 
+  api<Profile>(instance, 'GET', '/api/v1/accounts/verify_credentials', {}, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+;

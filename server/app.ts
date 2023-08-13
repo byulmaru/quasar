@@ -1,12 +1,18 @@
 import { Hono } from 'hono';
 import { NeonDatabase } from 'drizzle-orm/neon-serverless';
 
+type SessionData = {
+
+}
+
 type MyBinding = {
   Bindings: {
-    DATABASE: string
+    DATABASE: string,
+    JWT_SECRET: string
   },
   Variables: {
-    db: NeonDatabase
+    db: NeonDatabase,
+    session: SessionData
   }
 }
 
