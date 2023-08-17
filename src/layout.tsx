@@ -1,5 +1,5 @@
 import { Alignment, Button, Navbar } from '@blueprintjs/core';
-import { useNavigate, Outlet } from 'react-router-dom';
+import { useNavigate, Outlet, NavLink } from 'react-router-dom';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -12,7 +12,9 @@ export default function Layout() {
     <>
       <Navbar>
         <Navbar.Group align={Alignment.LEFT}>
-          <Navbar.Heading>Quasar by Planet</Navbar.Heading>
+          <Navbar.Heading>
+            <NavLink to="/">Quasar by Planet</NavLink>
+          </Navbar.Heading>
           <Navbar.Divider />
         </Navbar.Group>
         <Navbar.Group align={Alignment.RIGHT}>
