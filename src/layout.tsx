@@ -22,7 +22,7 @@ export default function Layout() {
         <Navbar.Group align={Alignment.RIGHT}>
           {
             session ? 
-            <Button className="bp5-minimal" icon="user" text={session.acct} /> :
+            <Button className="bp5-minimal" icon="user">{session.name}</Button> :
             <Button className="bp5-minimal" icon="log-in" text="로그인" onClick={() => navigate('/login')} />
           }
         </Navbar.Group>
