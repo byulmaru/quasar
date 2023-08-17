@@ -89,7 +89,7 @@ router.get('/callback', async(ctx) => {
   .setIssuedAt()
   .setExpirationTime('1h')
   .sign(new TextEncoder().encode(ctx.env.JWT_SECRET));
-  setCookie(ctx, 'token', jwt, { maxAge: 3600 });
+  setCookie(ctx, 'token', jwt, { path: '/', maxAge: 3600 });
   deleteCookie(ctx, 'oAuthInstance');
   return ctx.redirect('/');
 });
