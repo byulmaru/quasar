@@ -3,16 +3,17 @@ import app from '../../app';
 import oAuthAppTable from '../../schema/oauth-app';
 import { HTTPException } from 'hono/http-exception';
 import { createApp, getInstance, createOAuthToken, getProfileByToken } from '../../apis/mastodon';
-import { scopes, makeRedirectURI } from '../../constant';
+import { scopes, redirectURI } from '../../constant';
 import profileTable from '../../schema/profile';
 import { SignJWT } from 'jose';
-import { setCookie } from 'hono/cookie';
+import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
 
 const router = app();
 
-router.get('/:instance', async(ctx) => {
-  const instance = ctx.req.param('instance');
+router.get('/', async(ctx) => {
+  const instance = ctx.req.query('instance');
   const db = ctx.get('db');
+  if(!instance) throw new HTTPException(422, {message: 'Invalid instance'});
   let oAuthApp = (await ctx.get('db').select().from(oAuthAppTable).where(
     eq(oAuthAppTable.domain, instance)
   ))[0];
@@ -45,14 +46,17 @@ router.get('/:instance', async(ctx) => {
       throw new HTTPException(500, {message: 'Internal Server Error'});
     });
   }
+  setCookie(ctx, 'oAuthInstance', instance, { httpOnly: true });
   return ctx.redirect(
-    `https://${instance}/oauth/authorize?client_id=${oAuthApp.client.id}&redirect_uri=${encodeURIComponent(makeRedirectURI(instance))}&response_type=code&scope=${scopes.join('+')}&force_login=${!!ctx.req.query('forceLogin')}`
+    `https://${instance}/oauth/authorize?client_id=${oAuthApp.client.id}&redirect_uri=${encodeURIComponent(redirectURI)}&response_type=code&scope=${scopes.join('+')}&force_login=${!!ctx.req.query('forceLogin')}`
   );
 });
 
-router.get('/:instance/callback', async(ctx) => {
-  const instance = ctx.req.param('instance');
+router.get('/callback', async(ctx) => {
+  const instance = getCookie(ctx, 'oAuthInstance');
   const code = ctx.req.query('code');
+
+  if(!instance) throw new HTTPException(403, {message: 'Forbidden'});
 
   const oAuthApp = (await ctx.get('db').select().from(oAuthAppTable).where(
     eq(oAuthAppTable.domain, instance)
@@ -85,7 +89,8 @@ router.get('/:instance/callback', async(ctx) => {
   .setIssuedAt()
   .setExpirationTime('1h')
   .sign(new TextEncoder().encode(ctx.env.JWT_SECRET));
-  setCookie(ctx, 'token', jwt);
+  setCookie(ctx, 'token', jwt, { maxAge: 3600 });
+  deleteCookie(ctx, 'oAuthInstance');
   return ctx.redirect('/');
 });
 

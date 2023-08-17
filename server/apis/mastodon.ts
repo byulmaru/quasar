@@ -1,6 +1,6 @@
 import { HTTPException } from 'hono/http-exception';
 import api from '../api';
-import { scopes, makeRedirectURI } from '../constant';
+import { scopes, redirectURI } from '../constant';
 
 type Profile = {
   id: string,
@@ -17,7 +17,7 @@ type CreateAppResult = {
 
 export const createApp = (instance: string) => api<CreateAppResult>(instance, 'POST', '/api/v1/apps', {
   client_name: 'Quasar by Planet',
-  redirect_uris: makeRedirectURI(instance),
+  redirect_uris: redirectURI,
   scopes: scopes.join(' '),
   website: 'https://quasar.planet.moe'
 })
@@ -40,7 +40,7 @@ export const createOAuthToken = (instance: string, client: { id: string, secret:
   code,
   client_id: client.id,
   client_secret: client.secret,
-  redirect_uri: makeRedirectURI(instance),
+  redirect_uri: redirectURI,
   scope: scopes.join(' '),
 });
 
