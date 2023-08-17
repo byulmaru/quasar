@@ -1,5 +1,6 @@
 import { Alignment, Button, Navbar } from '@blueprintjs/core';
 import { useNavigate, Outlet, NavLink } from 'react-router-dom';
+import { getSession } from './session';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ export default function Layout() {
     margin: '0 auto', 
     padding: '0 5px'
   };
+  const session = getSession();
   return (
     <>
       <Navbar>
@@ -18,7 +20,11 @@ export default function Layout() {
           <Navbar.Divider />
         </Navbar.Group>
         <Navbar.Group align={Alignment.RIGHT}>
-          <Button className="bp3-minimal" icon="log-in" text="로그인" onClick={() => navigate('/login')}/>
+          {
+            session ? 
+            <Button className="bp5-minimal" icon="user" text={session.acct} /> :
+            <Button className="bp5-minimal" icon="log-in" text="로그인" onClick={() => navigate('/login')} />
+          }
         </Navbar.Group>
       </Navbar>
       <main style={mainStyle}>
