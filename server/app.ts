@@ -1,9 +1,6 @@
 import { Hono } from 'hono';
 import { NeonDatabase } from 'drizzle-orm/neon-serverless';
-
-type SessionData = {
-
-}
+import type { SessionData } from '../src/type';
 
 type MyBinding = {
   Bindings: {
