@@ -10,5 +10,4 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 drizzle.config.ts
 /.wrangler
-wrangler.toml
 .dev.vars
