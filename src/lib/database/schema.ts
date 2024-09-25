@@ -9,14 +9,14 @@ type OAuthAppInfo = {
 };
 
 export const Accounts = pgTable('accounts', {
-	id: idPk('ACNT'),
+	id: idPk(),
 	name: varchar('name').notNull(),
 	avatarUrl: varchar('avatar_url'),
 });
 
 export const AccountOAuthApps = pgTable('account_oauth_apps', {
-	id: idPk('AOAP'),
-	accountId: varchar('account_id')
+	id: idPk(),
+	accountId: id('account_id')
 		.notNull()
 		.references(() => Accounts.id),
 	appId: id('app_id')
@@ -27,15 +27,15 @@ export const AccountOAuthApps = pgTable('account_oauth_apps', {
 
 export const OAuthAppKind = pgEnum('OAuthAppKind', ['MASTODON', 'MISSKEY']);
 export const OAuthApps = pgTable('oauth_apps', {
-	id: idPk('OAPP'),
+	id: idPk(),
 	instance: varchar('instance').notNull().unique(),
 	kind: OAuthAppKind('kind').notNull(),
 	authInfo: json('auth_info').notNull().$type<OAuthAppInfo>(),
 });
 
 export const Sessions = pgTable('sessions', {
-	id: idPk('SESN'),
-	accountId: varchar('account_id')
+	id: idPk(),
+	accountId: id('account_id')
 		.notNull()
 		.references(() => Accounts.id),
 	oAuthAppId: id('oauth_app_id').references(() => OAuthApps.id),
@@ -43,10 +43,7 @@ export const Sessions = pgTable('sessions', {
 	token: varchar('token')
 		.notNull()
 		.$default(() => cryptoRandomString({ length: 32 })),
-	createdAt: datetime('created_at')
-		.notNull()
-		.default(sql`now()`),
-	lastUsedAt: varchar('last_used_at')
+	lastUsedAt: datetime('last_used_at')
 		.notNull()
 		.default(sql`now()`),
 });

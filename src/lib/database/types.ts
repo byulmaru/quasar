@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import { customType, varchar } from 'drizzle-orm/pg-core';
-import { ulid } from 'ulid';
+import { sql } from 'drizzle-orm';
+import { customType } from 'drizzle-orm/pg-core';
 
 export const datetime = customType<{ data: dayjs.Dayjs; driverData: string }>({
 	dataType: () => 'timestamp with time zone',
@@ -8,12 +8,16 @@ export const datetime = customType<{ data: dayjs.Dayjs; driverData: string }>({
 	toDriver: (value) => value.toISOString(),
 });
 
-export const id = varchar;
+export const id = customType<{ data: string; driverData: string }>({
+	dataType: () => 'ulid',
+	fromDriver: (value) => value,
+	toDriver: (value) => value,
+});
 
-export const idPk = (prefix: string) =>
-	varchar('id')
+export const idPk = (name: string = 'id') =>
+	id(name)
 		.primaryKey()
-		.$defaultFn(() => `${prefix}${ulid()}`);
+		.default(sql`gen_ulid()`);
 
 export const createdAt = (name: string = 'created_at') =>
-	datetime(name).$defaultFn(() => dayjs());
+	datetime(name).default(sql`now()`);

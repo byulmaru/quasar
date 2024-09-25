@@ -31,7 +31,7 @@ importers:
         version: 1.11.12
       drizzle-orm:
         specifier: ^0.32.1
-        version: 0.32.1(@cloudflare/workers-types@4.20240725.0)(@neondatabase/serverless@0.9.4)(@types/pg@8.11.6)
+        version: 0.32.1(@cloudflare/workers-types@4.20240725.0)(@neondatabase/serverless@0.9.4)(@types/pg@8.11.6)(postgres@3.4.4)
       ky:
         specifier: ^1.7.0
         version: 1.7.0
@@ -41,9 +41,6 @@ importers:
       query-string:
         specifier: ^9.1.0
         version: 9.1.0
-      ulid:
-        specifier: ^2.3.0
-        version: 2.3.0
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -87,6 +84,9 @@ importers:
       eslint-plugin-svelte:
         specifier: ^2.43.0
         version: 2.43.0(eslint@8.57.0)(svelte@4.2.18)
+      postgres:
+        specifier: ^3.4.4
+        version: 3.4.4
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
@@ -2221,6 +2221,10 @@ packages:
   postgres-range@1.1.4:
     resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
 
+  postgres@3.4.4:
+    resolution: {integrity: sha512-IbyN+9KslkqcXa8AO9fxpk97PA4pzewvpi2B3Dwy9u4zpV32QicaEdgmF3eSQUzdRk7ttDHQejNgAEr4XoeH4A==}
+    engines: {node: '>=12'}
+
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
@@ -2621,10 +2625,6 @@ packages:
 
   ufo@1.5.4:
     resolution: {integrity: sha512-UsUk3byDzKd04EyoZ7U4DOlxQaD14JUKQl6/P7wiX4FNvUfm3XL246n9W5AmqwW5RSFJ27NAuM0iLscAOYUiGQ==}
-
-  ulid@2.3.0:
-    resolution: {integrity: sha512-keqHubrlpvT6G2wH0OEfSW4mquYRcbe/J8NMmveoQOjUqmo+hXtO+ORCpWhdbZ7k72UtY61BL7haGxW6enBnjw==}
-    hasBin: true
 
   unbox-primitive@1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
@@ -3789,11 +3789,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.32.1(@cloudflare/workers-types@4.20240725.0)(@neondatabase/serverless@0.9.4)(@types/pg@8.11.6):
+  drizzle-orm@0.32.1(@cloudflare/workers-types@4.20240725.0)(@neondatabase/serverless@0.9.4)(@types/pg@8.11.6)(postgres@3.4.4):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20240725.0
       '@neondatabase/serverless': 0.9.4
       '@types/pg': 8.11.6
+      postgres: 3.4.4
 
   eastasianwidth@0.2.0: {}
 
@@ -4750,6 +4751,8 @@ snapshots:
 
   postgres-range@1.1.4: {}
 
+  postgres@3.4.4: {}
+
   prelude-ls@1.2.1: {}
 
   prettier-plugin-brace-style@0.6.2(prettier@3.3.3):
@@ -5186,8 +5189,6 @@ snapshots:
   typescript@5.5.4: {}
 
   ufo@1.5.4: {}
-
-  ulid@2.3.0: {}
 
   unbox-primitive@1.0.2:
     dependencies:
