@@ -15,20 +15,21 @@ type CreateOAuthAppResponse = {
 type CreateOAuthAppParams = {
 	instance: string;
 	db: NeonHttpDatabase;
-	origin: string;
+	domain: string;
 };
 
 const createOAuthApp = async ({
 	instance,
 	db,
-	origin,
+	domain,
 }: CreateOAuthAppParams) => {
 	const response = await ky
 		.post<CreateOAuthAppResponse>(`https://${instance}/api/v1/apps`, {
 			json: {
 				client_name: 'Quasar',
-				redirect_uris: getDomainUrl(`/login/mastodon/${instance}/callback`, {
-					origin,
+				redirect_uris: getDomainUrl({
+					domain,
+					path: `/login/mastodon/${instance}/callback`,
 				}),
 				scopes: MASTODON_OAUTH_SCOPE,
 			},
@@ -63,18 +64,23 @@ export const GET = async (req) => {
 
 	const app = appDbData
 		? appDbData.authInfo
-		: await createOAuthApp({ instance, db, origin: req.url.origin });
+		: await createOAuthApp({
+				instance,
+				db,
+				domain: req.platform!.env.WEB_DOMAIN,
+			});
 
 	return new Response(null, {
 		status: 302,
 		headers: {
 			Location: qs.stringifyUrl({
-				url: getDomainUrl('/oauth/authorize', { origin: instance }),
+				url: getDomainUrl({ domain: instance, path: '/oauth/authorize' }),
 				query: {
 					response_type: 'code',
 					client_id: app.clientId,
-					redirect_uri: getDomainUrl(`/login/mastodon/${instance}/callback`, {
-						origin: req.url.origin,
+					redirect_uri: getDomainUrl({
+						domain: req.platform!.env.WEB_DOMAIN,
+						path: `/login/mastodon/${instance}/callback`,
 					}),
 					scope: MASTODON_OAUTH_SCOPE,
 				},
