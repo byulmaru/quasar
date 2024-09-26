@@ -1,14 +1,12 @@
 type GetDomainUrlParams = {
-	origin: string;
+	domain: string;
+	path: string;
 };
 
-export const getDomainUrl = (
-	resolve: string = '',
-	{ origin }: GetDomainUrlParams,
-) => {
+export const getDomainUrl = ({ domain, path = '' }: GetDomainUrlParams) => {
 	const url = new URL(
-		origin.match(/^https?:\/\//) ? origin : `https://${origin}`,
+		domain.match(/^https?:\/\//) ? domain : `https://${domain}`,
 	);
-	url.pathname = resolve;
+	url.pathname = path;
 	return url.toString();
 };

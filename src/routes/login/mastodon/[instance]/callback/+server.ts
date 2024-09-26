@@ -45,8 +45,9 @@ export const GET = async (req) => {
 				code,
 				client_id: app.authInfo.clientId,
 				client_secret: app.authInfo.clientSecret,
-				redirect_uri: getDomainUrl(`/login/mastodon/${instance}/callback`, {
-					origin: req.url.origin,
+				redirect_uri: getDomainUrl({
+					domain: req.platform!.env.WEB_DOMAIN,
+					path: `/login/mastodon/${instance}/callback`,
 				}),
 			},
 		})
