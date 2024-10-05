@@ -3,8 +3,8 @@
 	import type { ComponentType } from 'svelte';
 	import { Fragment } from '@master/css.svelte';
 	import type { CSSRuntimeProvider as CSSProviderType } from '@master/css.svelte';
-	import Navbar from './Navbar.svelte';
 	import { writable } from 'svelte/store';
+	import Navbar from './Navbar.svelte';
 
 	import '@master/normal.css';
 	import './main.css';
