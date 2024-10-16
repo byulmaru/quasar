@@ -1,5 +1,11 @@
-import { json, pgEnum, pgTable, varchar } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
+import {
+	json,
+	pgEnum,
+	pgTable,
+	uniqueIndex,
+	varchar,
+} from 'drizzle-orm/pg-core';
+import { eq, sql } from 'drizzle-orm';
 import cryptoRandomString from 'crypto-random-string';
 import { datetime, id, idPk } from './types';
 
@@ -8,11 +14,24 @@ type OAuthAppInfo = {
 	clientSecret: string;
 };
 
-export const Accounts = pgTable('accounts', {
-	id: idPk(),
-	name: varchar('name').notNull(),
-	avatarUrl: varchar('avatar_url'),
-});
+export const AccountState = pgEnum('AccountState', [
+	'ACTIVE',
+	'DELETED',
+	'SUSPENDED',
+]);
+export const Accounts = pgTable(
+	'accounts',
+	{
+		id: idPk(),
+		state: AccountState('state').notNull().default('ACTIVE'),
+		slug: varchar('slug').notNull(),
+		name: varchar('name').notNull(),
+		avatarUrl: varchar('avatar_url'),
+	},
+	(t) => ({
+		slugUniqueIndex: uniqueIndex().on(t.slug).where(eq(t.state, 'ACTIVE')),
+	}),
+);
 
 export const AccountOAuthApps = pgTable('account_oauth_apps', {
 	id: idPk(),
