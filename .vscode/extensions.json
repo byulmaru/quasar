@@ -1,0 +1,9 @@
+{
+	"recommendations": [
+		"dbaeumer.vscode-eslint",
+		"rohit-gohri.format-code-action",
+		"masterco.master-css-language-service",
+		"esbenp.prettier-vscode",
+		"svelte.svelte-vscode"
+	]
+}
