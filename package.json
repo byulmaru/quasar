@@ -18,6 +18,8 @@
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20240925.0",
 		"@master/eslint-config-css": "2.0.0-rc.44",
+		"@melt-ui/pp": "^0.3.2",
+		"@melt-ui/svelte": "^0.83.0",
 		"@sveltejs/adapter-cloudflare": "^4.7.0",
 		"@sveltejs/kit": "^2.5.18",
 		"@sveltejs/vite-plugin-svelte": "^3.1.1",

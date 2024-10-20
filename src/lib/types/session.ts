@@ -1,6 +1,4 @@
-export type AccountSession =
-	| {
-			name: string;
-			avatarUrl: string;
-	  }
-	| undefined;
+export type AccountSession = {
+	name: string;
+	avatarUrl: string;
+};
