@@ -30,6 +30,7 @@ export const OAuthApps = pgTable('oauth_apps', {
 	id: idPk(),
 	instance: varchar('instance').notNull().unique(),
 	kind: OAuthAppKind('kind').notNull(),
+	redirectUri: varchar('redirect_uri').notNull(),
 	authInfo: json('auth_info').notNull().$type<OAuthAppInfo>(),
 });
 
