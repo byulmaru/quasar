@@ -31,7 +31,11 @@ export const GET = async (req) => {
 	// 1. 액세스 토큰 발급
 
 	const app = await db
-		.select({ id: OAuthApps.id, authInfo: OAuthApps.authInfo })
+		.select({
+			id: OAuthApps.id,
+			authInfo: OAuthApps.authInfo,
+			redirectUri: OAuthApps.redirectUri,
+		})
 		.from(OAuthApps)
 		.where(
 			and(eq(OAuthApps.instance, instance), eq(OAuthApps.kind, 'MASTODON')),
@@ -45,10 +49,13 @@ export const GET = async (req) => {
 				code,
 				client_id: app.authInfo.clientId,
 				client_secret: app.authInfo.clientSecret,
-				redirect_uri: getDomainUrl({
-					domain: req.platform!.env.WEB_DOMAIN,
-					path: `/login/mastodon/${instance}/callback`,
-				}),
+				redirect_uri:
+					getDomainUrl({
+						domain: req.platform!.env.WEB_DOMAIN,
+						path: `/login/mastodon/${instance}/callback`,
+					}) === app.redirectUri
+						? app.redirectUri
+						: 'urn:ietf:wg:oauth:2.0:oob',
 			},
 		})
 		.json()
