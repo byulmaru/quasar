@@ -3,5 +3,6 @@
 	"useTabs": true,
 	"plugins": ["prettier-plugin-svelte", "prettier-plugin-brace-style"],
 	"overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }],
-	"braceStyle": "stroustrup"
+	"braceStyle": "stroustrup",
+	"htmlWhitespaceSensitivity": "ignore"
 }

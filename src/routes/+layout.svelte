@@ -4,7 +4,7 @@
 	import { Fragment } from '@master/css.svelte';
 	import type { CSSRuntimeProvider as CSSProviderType } from '@master/css.svelte';
 	import { writable } from 'svelte/store';
-	import Navbar from './Navbar.svelte';
+	import Navbar from './nav/Navbar.svelte';
 
 	import '@master/normal.css';
 	import './main.css';
