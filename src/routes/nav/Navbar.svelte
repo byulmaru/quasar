@@ -18,7 +18,7 @@
 		</a>
 		<div class="flex:1"></div>
 		{#if $user}
-			<button class="background-color:gray-10:hover p:16" use:melt={$trigger}>
+			<button class="min-width:140 background-color:gray-10:hover p:16" use:melt={$trigger}>
 				{$user.name}
 			</button>
 			<div use:melt={$menu}>
@@ -37,3 +37,26 @@
 		{/if}
 	</div>
 </nav>
+
+<style>
+	[role=menu] {
+		width: 140px;
+		background-color: #fff;
+		box-shadow: 2px 2px 3px #c7c7c722;
+		border-radius: 0 0 5px 5px;
+		top: 3rem !important;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	[role=menuitem] {
+		padding: 10px;
+		width: 140px;
+		text-align: center;
+	}
+
+	[role=menuitem]:hover {
+		background-color: rgb(239 238 240);
+	}
+</style>
