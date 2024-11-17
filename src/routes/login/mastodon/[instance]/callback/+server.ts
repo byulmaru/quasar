@@ -16,6 +16,7 @@ type OAuthToken = {
 
 type OAuthUser = {
 	id: string;
+	username: string;
 	display_name: string;
 	avatar: string;
 };
@@ -112,6 +113,7 @@ export const GET = async (req) => {
 			.values({
 				name: user.display_name,
 				avatarUrl: user.avatar,
+				slug: `@${user.username}@${instance}`,
 			})
 			.returning({ id: Accounts.id })
 			.then(firstOrThrow);
