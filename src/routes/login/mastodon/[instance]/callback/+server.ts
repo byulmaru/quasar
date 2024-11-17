@@ -8,6 +8,7 @@ import {
 	Sessions,
 } from '$lib/database/schema.js';
 import { getDomainUrl } from '$lib/domain';
+import { dataValidation } from '$lib/validation';
 
 type OAuthToken = {
 	access_token: string;
@@ -21,7 +22,16 @@ type OAuthUser = {
 
 export const GET = async (req) => {
 	const db = getDatabase(req);
-	const instance = req.params.instance;
+	const instance = await dataValidation.instance
+		.safeParseAsync(req.params.instance)
+		.then((result) => {
+			if (result.success) {
+				return result.data;
+			}
+
+			throw new Error();
+		});
+
 	const code = req.url.searchParams.get('code');
 
 	if (!code) {
