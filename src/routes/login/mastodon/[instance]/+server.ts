@@ -6,6 +6,7 @@ import { OAuthApps } from '$lib/database/schema';
 import { first, firstOrThrow, getDatabase } from '$lib/database';
 import { getDomainUrl } from '$lib/domain';
 import { MASTODON_OAUTH_SCOPE } from '$lib/oauth';
+import { dataValidation } from '$lib/validation';
 
 type CreateOAuthAppResponse = {
 	client_id: string;
@@ -57,7 +58,15 @@ const createOAuthApp = async ({
 
 export const GET = async (req) => {
 	const db = getDatabase(req);
-	const instance = req.params.instance;
+	const instance = await dataValidation.instance
+		.safeParseAsync(req.params.instance)
+		.then((result) => {
+			if (result.success) {
+				return result.data;
+			}
+
+			throw new Error();
+		});
 
 	const app = await db
 		.select()
