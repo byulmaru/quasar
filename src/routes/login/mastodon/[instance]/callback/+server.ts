@@ -4,9 +4,11 @@ import { first, firstOrThrow, getDatabase } from '$lib/database';
 import {
 	AccountOAuthApps,
 	Accounts,
+	Boxes,
+	BoxMembers,
 	OAuthApps,
 	Sessions,
-} from '$lib/database/schema.js';
+} from '$lib/database/schema';
 import { getDomainUrl } from '$lib/domain';
 import { dataValidation } from '$lib/validation';
 
@@ -95,40 +97,49 @@ export const GET = async (req) => {
 			.then(first);
 
 		if (account) {
-			// 3-1. 이미 가입한 경우 -> 사용자 정보 업데이트
-			db.update(Accounts)
-				.set({
+			return account.accountId;
+		}
+		else {
+			// 3-1. 처음 가입하는 경우 -> 새로운 사용자 생성
+
+			const newAccount = await db
+				.insert(Accounts)
+				.values({
 					name: user.display_name,
 					avatarUrl: user.avatar,
 				})
-				.where(eq(Accounts.id, account.accountId));
+				.returning({ id: Accounts.id })
+				.then(firstOrThrow);
 
-			return account.accountId;
-		}
+			await db
+				.insert(AccountOAuthApps)
+				.values({
+					accountId: newAccount.id,
+					appId: app.id,
+					oAuthUserId: user.id,
+				})
+				.returning({ accountId: AccountOAuthApps.accountId })
+				.then(firstOrThrow);
 
-		// 3-2. 처음 가입하는 경우 -> 새로운 사용자 생성
+			const box = await db
+				.insert(Boxes)
+				.values({
+					name: `${user.display_name}의 질문 상자`,
+					slug: `${user.username}-${Math.floor(Math.random() * 1000000)
+						.toString()
+						.padStart(6, '0')}`,
+				})
+				.returning({ id: Boxes.id })
+				.then(firstOrThrow);
 
-		const newAccount = await db
-			.insert(Accounts)
-			.values({
-				name: user.display_name,
-				avatarUrl: user.avatar,
-				slug: `@${user.username}@${instance}`,
-			})
-			.returning({ id: Accounts.id })
-			.then(firstOrThrow);
-
-		await db
-			.insert(AccountOAuthApps)
-			.values({
+			await db.insert(BoxMembers).values({
+				boxId: box.id,
 				accountId: newAccount.id,
-				appId: app.id,
-				oAuthUserId: user.id,
-			})
-			.returning({ accountId: AccountOAuthApps.accountId })
-			.then(firstOrThrow);
+				role: 'OWNER',
+			});
 
-		return newAccount.id;
+			return newAccount.id;
+		}
 	})();
 
 	// 4. 세션 생성

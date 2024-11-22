@@ -3,6 +3,6 @@
 </script>
 
 <Navbar />
-<div class="width:100% max-width:800px margin:20px|auto">
+<div class="margin:20px|auto max-width:800px width:100%">
 	<slot />
 </div>
