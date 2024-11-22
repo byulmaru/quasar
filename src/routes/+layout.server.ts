@@ -13,7 +13,6 @@ export const load = async (req) => {
 	const user = await db
 		.select({
 			name: Accounts.name,
-			slug: Accounts.slug,
 			avatarUrl: Accounts.avatarUrl,
 		})
 		.from(Accounts)

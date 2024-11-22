@@ -1,11 +1,12 @@
 import {
+	index,
 	json,
 	pgEnum,
 	pgTable,
-	uniqueIndex,
+	text,
 	varchar,
 } from 'drizzle-orm/pg-core';
-import { eq, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import cryptoRandomString from 'crypto-random-string';
 import { datetime, id, idPk } from './types';
 
@@ -14,24 +15,41 @@ type OAuthAppInfo = {
 	clientSecret: string;
 };
 
+/**
+ * Enums
+ */
+
 export const AccountState = pgEnum('AccountState', [
 	'ACTIVE',
 	'DELETED',
 	'SUSPENDED',
 ]);
-export const Accounts = pgTable(
-	'accounts',
-	{
-		id: idPk(),
-		state: AccountState('state').notNull().default('ACTIVE'),
-		slug: varchar('slug').notNull(),
-		name: varchar('name').notNull(),
-		avatarUrl: varchar('avatar_url'),
-	},
-	(t) => ({
-		slugUniqueIndex: uniqueIndex().on(t.slug).where(eq(t.state, 'ACTIVE')),
-	}),
-);
+
+export const BoxState = pgEnum('BoxState', [
+	'PUBLIC',
+	'PRIVATE',
+	'SUSPENDED',
+	'DELETED',
+]);
+
+export const BoxMemberRole = pgEnum('BoxMemberRole', [
+	'OWNER',
+	'ADMIN',
+	'MEMBER',
+]);
+
+export const OAuthAppKind = pgEnum('OAuthAppKind', ['MASTODON', 'MISSKEY']);
+
+/**
+ * Tables
+ */
+
+export const Accounts = pgTable('accounts', {
+	id: idPk(),
+	state: AccountState('state').notNull().default('ACTIVE'),
+	name: varchar('name').notNull(),
+	avatarUrl: varchar('avatar_url'),
+});
 
 export const AccountOAuthApps = pgTable('account_oauth_apps', {
 	id: idPk(),
@@ -44,7 +62,29 @@ export const AccountOAuthApps = pgTable('account_oauth_apps', {
 	oAuthUserId: varchar('oauth_user_id').notNull(),
 });
 
-export const OAuthAppKind = pgEnum('OAuthAppKind', ['MASTODON', 'MISSKEY']);
+export const Boxes = pgTable(
+	'boxes',
+	{
+		id: idPk(),
+		state: BoxState('state').notNull().default('PUBLIC'),
+		slug: varchar('slug').notNull(),
+		name: varchar('name').notNull(),
+		description: text('description'),
+	},
+	(t) => ({
+		slugUniqueIndex: index()
+			.on(t.slug)
+			.where(sql`${t.state} <> 'DELETED'`),
+	}),
+);
+
+export const BoxMembers = pgTable('box_members', {
+	id: idPk(),
+	boxId: id('box_id').references(() => Boxes.id),
+	accountId: id('account_id').references(() => Accounts.id),
+	role: BoxMemberRole('role').notNull(),
+});
+
 export const OAuthApps = pgTable('oauth_apps', {
 	id: idPk(),
 	instance: varchar('instance').notNull().unique(),
