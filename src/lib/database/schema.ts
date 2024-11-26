@@ -38,6 +38,18 @@ export const BoxMemberRole = pgEnum('BoxMemberRole', [
 	'MEMBER',
 ]);
 
+export const QuestionState = pgEnum('QuestionState', [
+	'PENDING',
+	'ANSWERED',
+	'DELETED',
+]);
+
+export const QuestionerVisibility = pgEnum('QuestionerVisibility', [
+	'PUBLIC',
+	'ONLY_OWNER',
+	'PRIVATE',
+]);
+
 export const OAuthAppKind = pgEnum('OAuthAppKind', ['MASTODON', 'MISSKEY']);
 
 /**
@@ -66,6 +78,9 @@ export const Boxes = pgTable(
 	'boxes',
 	{
 		id: idPk(),
+		accountId: id('account_id')
+			.notNull()
+			.references(() => Accounts.id),
 		state: BoxState('state').notNull().default('PUBLIC'),
 		slug: varchar('slug').notNull(),
 		name: varchar('name').notNull(),
@@ -77,13 +92,6 @@ export const Boxes = pgTable(
 			.where(sql`${t.state} <> 'DELETED'`),
 	}),
 );
-
-export const BoxMembers = pgTable('box_members', {
-	id: idPk(),
-	boxId: id('box_id').references(() => Boxes.id),
-	accountId: id('account_id').references(() => Accounts.id),
-	role: BoxMemberRole('role').notNull(),
-});
 
 export const OAuthApps = pgTable('oauth_apps', {
 	id: idPk(),
@@ -106,4 +114,18 @@ export const Sessions = pgTable('sessions', {
 	lastUsedAt: datetime('last_used_at')
 		.notNull()
 		.default(sql`now()`),
+});
+
+export const Questions = pgTable('questions', {
+	id: idPk(),
+	boxId: id('box_id')
+		.notNull()
+		.references(() => Boxes.id),
+	accountId: id('account_id')
+		.notNull()
+		.references(() => Accounts.id),
+	state: QuestionState('state').notNull().default('PENDING'),
+	questionerVisibility: QuestionerVisibility('questioner_visibility').notNull(),
+	question: text('question').notNull(),
+	answer: text('answer'),
 });

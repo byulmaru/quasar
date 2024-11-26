@@ -1,8 +1,10 @@
 <script lang="ts">
-	import Navbar from '../nav/Navbar.svelte';
+	import Navbar from './Navbar.svelte';
+
+	const { children, data } = $props();
 </script>
 
-<Navbar />
+<Navbar account={data.account} boxes={data.boxes} />
 <div class="margin:20px|auto max-width:800px width:100%">
-	<slot />
+	{@render children()}
 </div>

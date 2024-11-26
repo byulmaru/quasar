@@ -1,10 +1,13 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { Writable } from 'svelte/store';
 	import { createDropdownMenu, melt } from '@melt-ui/svelte';
-	import type { AccountSession } from '$lib/types/session';
+	import type { Accounts, Boxes } from '$lib/database/schema';
 
-	const user = getContext<Writable<AccountSession | undefined>>('user');
+	type Props = {
+		account: typeof Accounts.$inferSelect | undefined;
+		boxes: (typeof Boxes.$inferSelect)[] | undefined;
+	};
+
+	const { account, boxes }: Props = $props();
 
 	const {
 		elements: { menu, item, trigger },
@@ -17,22 +20,30 @@
 			Quasar
 		</a>
 		<div class="flex:1"></div>
-		{#if $user}
+		{#if account}
 			<button
 				class="background-color:gray-10:hover min-width:140 p:16"
 				use:melt={$trigger}
 			>
-				{$user.name}
+				{account.name}
 			</button>
 			<div
 				class="align-items:center bg:white border-radius:0|0|5|5 box-shadow:2|2|3|#c7c7c722 display:flex flex-direction:column top:3rem! width:140"
 				use:melt={$menu}
 			>
+				{#each boxes! as box}
+					<div
+						class="bg:rgb(239|238|240):hover padding:10 text-align:center width:140"
+						use:melt={$item}
+					>
+						<a href={`/box/${box.slug}`}>{box.name}</a>
+					</div>
+				{/each}
 				<div
 					class="bg:rgb(239|238|240):hover padding:10 text-align:center width:140"
 					use:melt={$item}
 				>
-					<a href={`/profile/${$user.slug}`}>프로필</a>
+					<button>새 질문상자 만들기</button>
 				</div>
 				<div
 					class="bg:rgb(239|238|240):hover padding:10 text-align:center width:140"
