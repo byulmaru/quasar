@@ -7,11 +7,11 @@
 		label?: string;
 		description?: string;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		superform: SuperForm<any>;
+		superform?: SuperForm<any>;
 	} & HTMLInputAttributes;
 
 	let { name, label, description, superform, ...restProps }: Props = $props();
-	const { form, errors } = superform;
+	const { form, errors } = superform ?? {};
 </script>
 
 <label class="my:8">
@@ -20,10 +20,10 @@
 		{...restProps}
 		{name}
 		class="block b:1|gray-20 p:8 w:100%"
-		aria-invalid={$errors[name] ? 'true' : undefined}
+		aria-invalid={$errors?.[name] ? 'true' : undefined}
 		bind:value={$form[name]}
 	/>
-	{#if $errors[name]}
+	{#if $errors?.[name]}
 		<p class="color:red font:.75em">{$errors[name]}</p>
 	{/if}
 	{#if description}

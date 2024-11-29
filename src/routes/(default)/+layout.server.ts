@@ -19,4 +19,9 @@ export const load = async (req) => {
 			boxes,
 		};
 	}
+
+	return {
+		account: null,
+		boxes: [],
+	};
 };

@@ -3,8 +3,8 @@
 	import type { Accounts, Boxes } from '$lib/database/schema';
 
 	type Props = {
-		account: typeof Accounts.$inferSelect | undefined;
-		boxes: (typeof Boxes.$inferSelect)[] | undefined;
+		account: typeof Accounts.$inferSelect | null;
+		boxes: (typeof Boxes.$inferSelect)[];
 	};
 
 	const { account, boxes }: Props = $props();
@@ -31,19 +31,25 @@
 				class="align-items:center bg:white border-radius:0|0|5|5 box-shadow:2|2|3|#c7c7c722 display:flex flex-direction:column top:3rem! width:140"
 				use:melt={$menu}
 			>
-				{#each boxes! as box}
+				{#each boxes as box}
 					<div
 						class="bg:rgb(239|238|240):hover padding:10 text-align:center width:140"
 						use:melt={$item}
 					>
 						<a href={`/box/${box.slug}`}>{box.name}</a>
 					</div>
+				{:else}
+					<div class="color:#666 padding:10 text-align:center width:140">
+						질문상자가 없어요
+					</div>
 				{/each}
 				<div
 					class="bg:rgb(239|238|240):hover padding:10 text-align:center width:140"
 					use:melt={$item}
 				>
-					<button>새 질문상자 만들기</button>
+					<button onclick={() => alert('준비중입니다')}>
+						새 질문상자 만들기
+					</button>
 				</div>
 				<div
 					class="bg:rgb(239|238|240):hover padding:10 text-align:center width:140"

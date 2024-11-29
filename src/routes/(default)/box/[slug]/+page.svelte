@@ -4,7 +4,7 @@
 
 	const { data } = $props();
 
-	const form = superForm(data.form);
+	const superform = superForm(data.form);
 </script>
 
 <div
@@ -15,8 +15,8 @@
 		<div>{data.box.description}</div>
 	</div>
 
-	<form method="POST" use:form.enhance>
-		<TextArea name="question" superform={form} />
+	<form method="POST" use:superform.enhance>
+		<TextArea name="question" {superform} />
 		<button type="submit">질문하기</button>
 	</form>
 </div>
