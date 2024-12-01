@@ -1,18 +1,32 @@
 <script lang="ts">
-	import TextInput from './TextInput.svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { SuperForm } from 'sveltekit-superforms';
 
-	export let name: string;
-	export let label: string | undefined = undefined;
-	export let value: HTMLInputElement['value'] | undefined = undefined;
-	export let description: string | undefined = undefined;
+	type Props = {
+		name: string;
+		label?: string;
+		description?: string;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		superform?: SuperForm<any>;
+	} & HTMLInputAttributes;
+
+	let { name, label, description, superform, ...restProps }: Props = $props();
+	const { form, errors } = superform ?? {};
 </script>
 
-<div class="my:16">
-	{#if label}
-		<label class="block mb:4" for={`form-input-${name}`}>{label}</label>
+<label class="my:8">
+	{label}
+	<input
+		{...restProps}
+		{name}
+		class="block b:1|gray-20 p:8 w:100%"
+		aria-invalid={$errors?.[name] ? 'true' : undefined}
+		bind:value={$form[name]}
+	/>
+	{#if $errors?.[name]}
+		<p class="color:red font:.75em">{$errors[name]}</p>
 	{/if}
-	<TextInput {...$$restProps} {name} bind:value />
 	{#if description}
-		<p class="color:#666 font:12 mt:4">{description}</p>
+		<p class="color:#666 font:.75em">{description}</p>
 	{/if}
-</div>
+</label>

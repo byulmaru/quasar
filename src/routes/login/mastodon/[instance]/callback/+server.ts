@@ -5,7 +5,6 @@ import {
 	AccountOAuthApps,
 	Accounts,
 	Boxes,
-	BoxMembers,
 	OAuthApps,
 	Sessions,
 } from '$lib/database/schema';
@@ -121,9 +120,10 @@ export const GET = async (req) => {
 				.returning({ accountId: AccountOAuthApps.accountId })
 				.then(firstOrThrow);
 
-			const box = await db
+			await db
 				.insert(Boxes)
 				.values({
+					accountId: newAccount.id,
 					name: `${user.display_name}의 질문 상자`,
 					slug: `${user.username}-${Math.floor(Math.random() * 1000000)
 						.toString()
@@ -131,12 +131,6 @@ export const GET = async (req) => {
 				})
 				.returning({ id: Boxes.id })
 				.then(firstOrThrow);
-
-			await db.insert(BoxMembers).values({
-				boxId: box.id,
-				accountId: newAccount.id,
-				role: 'OWNER',
-			});
 
 			return newAccount.id;
 		}

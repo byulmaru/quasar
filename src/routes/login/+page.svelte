@@ -1,13 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { superForm } from 'sveltekit-superforms';
 	import { goto } from '$app/navigation';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import InputField from '$lib/components/InputField.svelte';
 	import { dataValidation } from '$lib/validation';
 
-	let lastSucceedInstance: string;
-	let instance = '';
+	let { data } = $props();
+
+	const superform = superForm(data.form);
+	let { form } = superform;
+
+	let lastSucceedInstance = $state('');
 
 	onMount(() => {
 		lastSucceedInstance =
@@ -15,16 +20,16 @@
 	});
 
 	async function loginWithMastodon() {
-		instance ||= lastSucceedInstance;
-		const parseResult = dataValidation.instance.safeParse(instance);
+		$form.instance ||= lastSucceedInstance;
+		const parseResult = dataValidation.instance.safeParse($form.instance);
 
 		if (parseResult.success) {
-			instance = parseResult.data;
+			$form.instance = parseResult.data;
 		} else {
 			return;
 		}
 
-		await goto(`/login/mastodon/${instance}`);
+		await goto(`/login/mastodon/${$form.instance}`);
 	}
 </script>
 
@@ -35,7 +40,7 @@
 		inputmode="url"
 		label="서버 주소"
 		placeholder={lastSucceedInstance}
-		bind:value={instance}
+		{superform}
 	/>
 	<div class="flex gap:8">
 		<Button
