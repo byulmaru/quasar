@@ -5,6 +5,9 @@
 	const { data } = $props();
 
 	const superform = superForm(data.form);
+
+	//TODO: 자기 자신일 때만
+	const myBox = true
 </script>
 
 <div
@@ -13,6 +16,9 @@
 	<div>
 		<h1>{data.box.name}</h1>
 		<div>{data.box.description}</div>
+		{#if myBox}
+		<div><a href="{location.href}/manage">질문상자 관리</a></div>
+		{/if}
 	</div>
 
 	<form method="POST" use:superform.enhance>
