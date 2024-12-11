@@ -4,14 +4,16 @@
 
 	type Props = {
 		name: string;
-        options: string;
+        optionValues: Array<string>;
+		optionKeys: Array<string>;
 		label?: string;
 		description?: string;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		superform?: SuperForm<any>;
 	} & HTMLInputAttributes;
 
-	let { name, options, label, description, superform, ...restProps }: Props = $props();
+	let { name, optionValues, optionKeys, label, description, superform, ...restProps }: Props = $props();
+
 	const { form, errors } = superform ?? {};
 </script>
 
@@ -24,8 +26,8 @@
 		aria-invalid={$errors?.[name] ? 'true' : undefined}
 		bind:value={$form[name]}
 	>
-        {#each options.split('|') as option}
-        <option value={option.split(':')[0]}>{option.split(':')[1]}</option>
+        {#each optionKeys as option, i}
+        <option value={optionValues[i]}>{option}</option>
         {/each}
     </select>
 	{#if $errors?.[name]}
