@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { ComponentType } from 'svelte';
 	import { Fragment } from '@master/css.svelte';
 	import type { CSSRuntimeProvider as CSSProviderType } from '@master/css.svelte';
-	import { writable } from 'svelte/store';
 
 	import '@master/normal.css';
 	import './main.css';
@@ -15,13 +14,6 @@
 		CSSRuntimeProvider = (await import('@master/css.svelte'))
 			.CSSRuntimeProvider;
 	});
-
-	export let data;
-
-	const user = writable();
-	$: user.set(data.user);
-
-	setContext('user', user);
 </script>
 
 <svelte:component this={CSSRuntimeProvider} config={import('../../master.css')}>

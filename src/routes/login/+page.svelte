@@ -34,7 +34,7 @@
 </script>
 
 <Card>
-	<h1>로그인</h1>
+	<h1 class="font-size:2em font:bold">로그인</h1>
 	<InputField
 		name="instance"
 		inputmode="url"
