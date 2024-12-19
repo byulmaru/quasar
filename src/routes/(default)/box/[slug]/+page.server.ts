@@ -15,8 +15,12 @@ const questionSchema = z.object({
 
 export const load = async (req) => {
 	const db = getDatabase(req);
+	const me = await getAccountFromSession(req);
+
 	const box = await db
 		.select({
+			id: Boxes.id,
+			accountId: Boxes.accountId,
 			name: Boxes.name,
 			state: Boxes.state,
 			slug: Boxes.slug,
@@ -26,10 +30,23 @@ export const load = async (req) => {
 		.where(and(eq(Boxes.slug, req.params.slug), eq(Boxes.state, 'PUBLIC')))
 		.then(firstOrThrow);
 
+	const questions = await db
+		.select()
+		.from(Questions)
+		.where(and(eq(Questions.boxId, box.id), eq(Questions.state, 'ANSWERED')));
+
 	const form = await superValidate(zod(questionSchema));
 
 	return {
-		box,
+		box: {
+			id: box.id,
+			name: box.name,
+			state: box.state,
+			slug: box.slug,
+			description: box.description,
+			isMine: box.accountId === me?.id,
+		},
+		questions,
 		form,
 	};
 };
