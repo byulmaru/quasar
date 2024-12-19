@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { fail, superValidate } from 'sveltekit-superforms';
+import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { firstOrThrow, getDatabase } from '$lib/database';
@@ -12,9 +12,9 @@ const boxManageSchema = z.object({
 		.max(12, '최대 12글자까지 입력할 수 있어요'),
 	slug: z
 		.string()
-	    .regex(/^[a-z0-9-]+$/, '영문, 숫자, 하이픈(-)만 사용할 수 있어요')
+		.regex(/^[a-z0-9-]+$/, '영문, 숫자, 하이픈(-)만 사용할 수 있어요')
 		.min(3, '3글자 이상 입력해 주세요')
-		.max(20, '최대 20글자까지 입력할 수 있어요')
+		.max(20, '최대 20글자까지 입력할 수 있어요'),
 });
 
 export const load = async (req) => {
@@ -30,10 +30,13 @@ export const load = async (req) => {
 		.where(and(eq(Boxes.slug, req.params.slug), eq(Boxes.state, 'PUBLIC')))
 		.then(firstOrThrow);
 
-	const form = await superValidate({
-		name: box.name,
-		slug: box.slug
-	}, zod(boxManageSchema));
+	const form = await superValidate(
+		{
+			name: box.name,
+			slug: box.slug,
+		},
+		zod(boxManageSchema),
+	);
 
 	return {
 		box,
