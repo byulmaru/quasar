@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
 	import Button from '$lib/components/Button.svelte';
-	import Select from '$lib/components/Select.svelte'; //TODO
+	import Select from '$lib/components/Select.svelte';
 	import InputField from '$lib/components/InputField.svelte';
 
 	const { data } = $props();
