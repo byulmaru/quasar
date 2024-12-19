@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from '$app/stores';
 	import { superForm } from 'sveltekit-superforms';
 	import TextArea from '$lib/components/TextArea.svelte';
 
@@ -17,7 +18,7 @@
 		<h1>{data.box.name}</h1>
 		<div>{data.box.description}</div>
 		{#if myBox}
-		<div><a href="{location.href}/manage">질문상자 관리</a></div>
+		<div><a href={`${$page.params.slug}/manage`}>질문상자 관리</a></div>
 		{/if}
 	</div>
 

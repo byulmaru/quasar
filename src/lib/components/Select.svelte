@@ -4,10 +4,10 @@
 
 	type Props = {
 		name: string;
-		options: {
-			texts: Array<string>,
-			values: Array<string>
-		};
+		options: Array<{
+			text: string;
+			value: string;
+		}>;
 		label?: string;
 		description?: string;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
