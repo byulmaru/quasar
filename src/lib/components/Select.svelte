@@ -1,20 +1,21 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLSelectAttributes } from 'svelte/elements';
 	import type { SuperForm } from 'sveltekit-superforms';
 
 	type Props = {
 		name: string;
-		options: Array<{
+		options: {
 			text: string;
 			value: string;
-		}>;
+		}[];
 		label?: string;
 		description?: string;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		superform?: SuperForm<any>;
-	} & HTMLInputAttributes;
+	} & HTMLSelectAttributes;
 
-	let { name, options, label, description, superform, ...restProps }: Props = $props();
+	let { name, options, label, description, superform, ...restProps }: Props =
+		$props();
 	const { form, errors } = superform ?? {};
 </script>
 
@@ -27,10 +28,10 @@
 		aria-invalid={$errors?.[name] ? 'true' : undefined}
 		bind:value={$form[name]}
 	>
-        {#each options.texts as option, i}
-        <option value={options.values[i]}>{option}</option>
-        {/each}
-    </select>
+		{#each options as option}
+			<option value={option.value}>{option.text}</option>
+		{/each}
+	</select>
 	{#if $errors?.[name]}
 		<p class="color:red font:.75em">{$errors[name]}</p>
 	{/if}
